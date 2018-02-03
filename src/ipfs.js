@@ -4,7 +4,7 @@ module.exports = class Download {
   constructor () {
     this.download = async (req, res) => {
       try {
-        const data = await this.get(req.params.name)
+        const data = await Download.get(req.params.name)
         return res.json({ ok: true, data })
       } catch (error) {
         return res.json({ ok: false, error })
@@ -12,8 +12,8 @@ module.exports = class Download {
     }
     this.pin = async (req, res) => {
       try {
-        await this.pin(req.params.name)
-        return res.json({ ok: true })
+        const data = await Download.publishHash(req.params.name)
+        return res.json({ ok: true, data })
       } catch (error) {
         console.log(error.stack)
         return res.json({ ok: false, error: error.message })
@@ -22,16 +22,25 @@ module.exports = class Download {
     this.resolve = async (req, res) => {
       try {
         const shouldGetDependencies = req.query.dependencies === 'true'
-        const url = await this.getTarget(req.params.name, shouldGetDependencies)
+        const url = await Download.getTarget(req.params.name, shouldGetDependencies)
         return res.json({ ok: true, url })
       } catch (error) {
-        console.log(error.stack)
+        console.log(`ERROR: ${error.stack}`)
+        return res.json({ ok: false, error: error.message })
+      }
+    }
+    this.dependencies = async (req, res) => {
+      try {
+        const dependencies = await Download.resolveDependencies(req.params.ipfs)
+        return res.json({ ok: true, url })
+      } catch (error) {
+        console.log(`ERROR: ${error.stack}`)
         return res.json({ ok: false, error: error.message })
       }
     }
   }
 
-  get (name) {
+  static get (name) {
     return new Promise((resolve, reject) => {
       execFile('ipfs', ['cat', `/ipfs/${name}`],
         (err, stdout, stderr) => {
@@ -42,29 +51,29 @@ module.exports = class Download {
     })
   }
 
-  publishHash (name) {
+  static publishHash (name) {
     return new Promise((resolve, reject) => {
       execFile('ipfs', ['pin', 'add', name], (err, stdout, stderr) => {
         if (err) {
           return reject(stderr)
         }
-        return resolve()
+        return resolve(stdout)
       })
     })
   }
 
-  getTarget (name, shouldGetDependencies = false) {
-    const ipfs = await resolveDependencies(name)
+  static async getTarget (name, shouldGetDependencies = false) {
+    const ipfs = await Download.resolveIPNS(name)
     let dependencies = []
     if (shouldGetDependencies) {
-      dependencies = await this.resolveDependencies(ipfs)
+      dependencies = await Download.resolveDependencies(ipfs)
     }
-    return { ipfs, dependencies }
+    return new Promise(resolve => resolve({ ipfs, dependencies }))
   }
 
-  async resolveIPNS (input) {
+  static async resolveIPNS (hash) {
     return new Promise((resolve, reject) => {
-      execFile('ipfs', ['name', 'resolve', name], (err, stdout, stderr) => {
+      execFile('ipfs', ['name', 'resolve', hash], (err, stdout, stderr) => {
         if (err) return reject(stderr)
         const ipfs = stdout.substr(6, stdout.length - 7)
         return resolve(ipfs)
@@ -72,7 +81,7 @@ module.exports = class Download {
     })
   }
 
-  async resolveDependencies (ipfs) {
+  static async resolveDependencies (ipfs) {
     return new Promise((resolve, reject) => {
       execFile('ipfs', ['refs', '-u=true', '-r', ipfs], {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
         if (err) return reject(stderr)

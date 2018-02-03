@@ -14,11 +14,14 @@ app.use(bodyParser.json({ limit: '10kb' }))
 
 // IPFS Handler
 const ipfs = new IPFS()
+
 app.post('/api/pin/:name', ipfs.pin)
 
 app.get('/api/get/:name', ipfs.download)
 
 app.get('/api/resolve/:name', ipfs.resolve)
+
+app.get('/api/dependencies/:ipfs', ipfs.dependencies)
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Listening on port 3000...')
