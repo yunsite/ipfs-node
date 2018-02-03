@@ -8,9 +8,9 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 | ------------- |:-------------:|-------------|
 | api/resolve/:ipns | GET | { url: { ipfs: string } } | 
 | api/resolve/:ipns?dependencies=true | GET | { url: { ipfs: string, dependencies: array } } | 
-| api/pin/:ipfs | POST | { ok: true } | 
-| api/get/:ipfs | GET | { data } | 
+| api/get/:ipfs | GET | { data: string } | 
 | api/dependencies/:ipns: | GET | { dependencies: [] } |
+| api/pin/:ipfs | POST | { data: string } | 
 
 ## Debugging
 
