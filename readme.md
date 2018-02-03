@@ -4,13 +4,13 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 
 ## Public API
 
-| Endpoint| response |
-| ------------- |-------------|
-|`api/resolve/{ipfs}` | { url: { ipfs: string } } | 
-|`api/resolve/{ipfs}?dependencies=true` | { url: { ipfs: string, dependencies: array } } | 
-|`api/pin/{ipfs}` | { ok: true } | 
-|`api/get/{ipfs}` | { data } | 
-|`api/dependencies/{ipns}` | { dependencies: [] } |
+| Endpoint| Method | Response |
+| ------------- |:-------------:|-------------|
+| api/resolve/:ipns | GET | { url: { ipfs: string } } | 
+| api/resolve/:ipns?dependencies=true | GET | { url: { ipfs: string, dependencies: array } } | 
+| api/pin/:ipfs | POST | { ok: true } | 
+| api/get/:ipfs | GET | { data } | 
+| api/dependencies/:ipns: | GET | { dependencies: [] } |
 
 ## Debugging
 
