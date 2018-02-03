@@ -27,7 +27,7 @@ You need to create your own source of assets and publish it. Let's say to create
 - sample 
   * child1
     - text.txt
-  * hild2.txt
+  * child2.txt
 
 You can upload publish your assets like:
 
@@ -50,7 +50,7 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
 
 ```javascript
 # @GET
-# api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR
+# api/resolve/QmNwrcEu5AiDdKZEWzFcGbWxP5j7E1z4eNC7xWaJaVjKMU
 # Should return:
 {
   "ok":true,
@@ -63,7 +63,7 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
 
 ```javascript
 # @GET
-# api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
+# api/resolve/QmNwrcEu5AiDdKZEWzFcGbWxP5j7E1z4eNC7xWaJaVjKMU?dependencies=true
 {
   "ok":true,
   "url":{
@@ -78,7 +78,7 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
 Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` if one of the txt files.
 
 ```javascript
-# @GET 
+# @POST 
 # api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
 {
   "ok":true,
