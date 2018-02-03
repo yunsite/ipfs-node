@@ -49,7 +49,7 @@ ipfs name publish QmUt8guW4C7zDZ7WHociwudbfs83zMZ7Rkxrjkoeg3QupX
 Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies using the API.
 
 ```javascript
-#@GET
+# @GET
 # api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR
 # Should return:
 {
@@ -62,8 +62,8 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
 ```
 
 ```javascript
-#@GET
-#api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
+# @GET
+# api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
 {
   "ok":true,
   "url":{
@@ -105,3 +105,6 @@ Notice you cannot get node, only leaf.
 docker build . -t upload:latest
 docker run -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 upload:latest
 ```
+
+## Version
+2.0.0 - Refactor API gateways.
