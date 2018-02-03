@@ -5,6 +5,7 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 ## Public API
 
 | Endpoint| response |
+| ------------- |-------------|
 |`api/resolve/{ipfs}` | { url: { ipfs: string } } | 
 |`api/resolve/{ipfs}?dependencies=true` | { url: { ipfs: string, dependencies: array } } | 
 |`api/pin/{ipfs}` | { ok: true } | 
@@ -47,14 +48,10 @@ ipfs name publish QmUt8guW4C7zDZ7WHociwudbfs83zMZ7Rkxrjkoeg3QupX
 ```
 Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies using the API.
 
-```
-@GET
-api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR
-```
-
-Should return:
-
 ```javascript
+#@GET
+# api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR
+# Should return:
 {
   "ok":true,
   "url":{
@@ -64,14 +61,9 @@ Should return:
 }
 ```
 
-```
-@GET
-api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
-```
-
-returns
-
 ```javascript
+#@GET
+#api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
 {
   "ok":true,
   "url":{
@@ -85,32 +77,25 @@ returns
 ```
 Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` if one of the txt files.
 
-```
-  @GET 
-  api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
-```
-returns
-
 ```javascript
+# @GET 
+# api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
 {
   "ok":true,
   "data": "pinned QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK recursively"
 }
+```
 
 Pinned to the local storage.
 
-```
-@GET
-api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
-```
-
-Should return
-
 ```javascript
+# @GET
+# api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
 {
   "ok":true,
   "date": "whatever string is on your txt file\n"
 }
+```
 
 Notice you cannot get node, only leaf.
 
