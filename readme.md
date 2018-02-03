@@ -4,12 +4,12 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 
 ## Public API
 
-|Endpoint|response|
-|`api/resolve/{ipfs}`| { url: { ipfs: string } } | 
-|`api/resolve/{ipfs}?dependencies=true`| { url: { ipfs: string, dependencies: array } } | 
-|`api/pin/{ipfs}`| { ok: true } | 
-|`api/get/{ipfs}`| { data } | 
-|`api/dependencies/{ipns}`| { dependencies: [] } |
+| Endpoint| response |
+|`api/resolve/{ipfs}` | { url: { ipfs: string } } | 
+|`api/resolve/{ipfs}?dependencies=true` | { url: { ipfs: string, dependencies: array } } | 
+|`api/pin/{ipfs}` | { ok: true } | 
+|`api/get/{ipfs}` | { data } | 
+|`api/dependencies/{ipns}` | { dependencies: [] } |
 
 ## Debugging
 
@@ -24,13 +24,13 @@ The command api is documented [here](https://ipfs.io/docs/commands/).
 You need to create your own source of assets and publish it. Let's say to create a 2 level deep folder structure like:
 
 - sample 
-  -- child1
-    --- text.txt
-  -- child2.txt
+  * child1
+    - text.txt
+  * hild2.txt
 
 You can upload publish your assets like:
 
-``bash
+```
 ipfs add -r ./sample
 ```
 This will return a list of hashes per element, take the main one from the parent directory.
@@ -47,7 +47,10 @@ ipfs name publish QmUt8guW4C7zDZ7WHociwudbfs83zMZ7Rkxrjkoeg3QupX
 ```
 Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies using the API.
 
-`@GET api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR`
+```
+@GET
+api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR
+```
 
 Should return:
 
@@ -61,7 +64,12 @@ Should return:
 }
 ```
 
-`@GET api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true`
+```
+@GET
+api/resolve/QmQC5yqpDaKdw8zyHpSJHUgWmf657uMn2RgCU3C7VSWztR?dependencies=true
+```
+
+returns
 
 ```javascript
 {
@@ -75,10 +83,14 @@ Should return:
   }
 }
 ```
-
 Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` if one of the txt files.
 
-`@GET `api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK`
+```
+  @GET 
+  api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
+```
+returns
+
 ```javascript
 {
   "ok":true,
@@ -87,7 +99,13 @@ Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` if one of the txt file
 
 Pinned to the local storage.
 
-`@GET api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK`
+```
+@GET
+api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
+```
+
+Should return
+
 ```javascript
 {
   "ok":true,
@@ -95,9 +113,6 @@ Pinned to the local storage.
 }
 
 Notice you cannot get node, only leaf.
-
-
-
 
 ## Usage with docker
 

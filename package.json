@@ -7,8 +7,7 @@
     "test": "tape test/*.js && standard",
     "docker:build": "docker build . -t uploader:latest",
     "docker:run": "docker run -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 uploader:latest",
-    "start": "node src/server.js",
-    "dev": "nodemon sec/server.js"
+    "start": "node src/server.js"
   },
   "author": "The Decentraland Team",
   "license": "Apache-2.0",
