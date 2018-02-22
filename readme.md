@@ -93,7 +93,7 @@ Pinned to the local storage.
 # api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
 {
   "ok":true,
-  "date": "whatever string is on your txt file\n"
+  "data": "whatever string is on your txt file\n"
 }
 ```
 

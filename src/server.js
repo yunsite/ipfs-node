@@ -2,6 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const IPFS = require('./ipfs')
+const { connect } = require('./ethereum')
+
 
 const app = express()
 
@@ -15,14 +17,15 @@ app.use(bodyParser.json({ limit: '10kb' }))
 // IPFS Handler
 const ipfs = new IPFS()
 
-app.post('/api/pin/:name', ipfs.pin)
+app.get('/api/pin/:peerId/:x/:y', ipfs.pin)
 
-app.get('/api/get/:name', ipfs.download)
+app.get('/api/get/:ipfs', ipfs.download)
 
-app.get('/api/resolve/:name', ipfs.resolve)
+app.get('/api/resolve/:ipns', ipfs.resolve)
 
 app.get('/api/dependencies/:ipfs', ipfs.dependencies)
 
 app.listen(process.env.PORT || 3000, () => {
+  connect()
   console.log('Listening on port 3000...')
 })
