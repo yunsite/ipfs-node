@@ -1,16 +1,19 @@
 const execFile = require('child_process').execFile
 const { getIPNS } = require('./ethereum')
-const { isAllowed } = require('./blacklist')
+const { isBlacklisted } = require('./blacklist')
+const { saveIPFS, getIPFS } = require('./database')
 
 module.exports = class Download {
   constructor () {
     this.download = async (req, res) => {
       try {
         const ipfs = req.params.ipfs
-        if (await isAllowed(ipfs)) {
-          const data = await Download.get(ipfs)
-          return res.json({ok: true, data})
+        const blackListed = await isBlacklisted(ipfs)
+        if (blackListed) {
+          throw new Error(`IPFS ${ipfs} is blacklisted`)
         }
+        const data = await Download.get(ipfs)
+        return res.json({ok: true, data})
       } catch (error) {
         return res.json({ ok: false, error: error.message })
       }
@@ -26,6 +29,7 @@ module.exports = class Download {
         if (connect) {
           const ipfs = await Download.resolveIPNS(ipns)
           response = await Download.publishHash(ipfs)
+          await saveIPFS(ipns, ipfs)
         }
         return res.json({ ok: response })
       } catch (error) {
@@ -44,12 +48,13 @@ module.exports = class Download {
     this.dependencies = async (req, res) => {
       try {
         const ipfs = req.params.ipfs
-        if (await isAllowed(ipfs)) {
-          const dependencies = await Download.resolveDependencies(ipfs)
-          return res.json({ok: true, dependencies})
+        const blackListed = await isBlacklisted(ipfs)
+        if (blackListed) {
+          throw new Error(`IPFS ${ipfs} is blacklisted`)
         }
+        const dependencies = await Download.resolveDependencies(ipfs)
+        return res.json({ok: true, dependencies})
       } catch (error) {
-        console.log(`ERROR: ${error.stack}`)
         return res.json({ ok: false, error: error.message })
       }
     }
@@ -81,21 +86,37 @@ module.exports = class Download {
     })
   }
 
-  static async getTarget (name, shouldGetDependencies = false) {
-    const ipfs = await Download.resolveIPNS(name)
-    if (await isAllowed(ipfs)) {
+  static async getTarget (ipns, shouldGetDependencies = false) {
+    let ipfs = ''
+    try {
+      ipfs = await Download.resolveIPNS(ipns)
+    } catch (error) {
+      if (error.message.indexOf('can not resolve IPNS')) {
+        // check in our internal dht
+        ipfs = await getIPFS(ipns)
+      } else {
+        return new Promise((resolve, reject) => reject(error))
+      }
+    }
+    try {
       let dependencies = []
       if (shouldGetDependencies) {
         dependencies = await Download.resolveDependencies(ipfs)
       }
-      return new Promise(resolve => resolve({ipfs, dependencies}))
+      const blackListed = await isBlacklisted(dependencies.concat(ipfs).join(','))
+      if (blackListed) {
+        throw new Error(`IPFS ${ipfs} is blacklisted`)
+      }
+      return new Promise(resolve => resolve({ ipfs, dependencies }))
+    } catch (error) {
+      return new Promise((resolve, reject) => reject(error))
     }
   }
 
-  static resolveIPNS (hash) {
+  static resolveIPNS (ipns) {
     return new Promise((resolve, reject) => {
-      execFile('ipfs', ['name', 'resolve', '--nocache', hash], (err, stdout, stderr) => {
-        if (err) return reject(stderr)
+      execFile('ipfs', ['name', 'resolve', '--nocache', ipns], (err, stdout, stderr) => {
+        if (err) return reject(new Error(stderr))
         const ipfs = stdout.substr(6, stdout.length - 7)
         return resolve(ipfs)
       })
@@ -105,7 +126,7 @@ module.exports = class Download {
   static resolveDependencies (ipfs) {
     return new Promise((resolve, reject) => {
       execFile('ipfs', ['refs', '-u=true', '-r', ipfs], {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
-        if (err) return reject(stderr)
+        if (err) return reject(new Error(stderr))
         const dependencies = stdout.split(/\r?\n/).filter(ipfs => ipfs)
         return resolve(dependencies)
       })

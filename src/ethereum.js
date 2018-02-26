@@ -3,7 +3,7 @@ require('dotenv').config({path: './.env'})
 const web3Eth = require('decentraland-commons').eth
 const LANDRegistry = require('decentraland-commons/dist/contracts').LANDRegistry
 
-async function connect () {
+async function connectBlockchain () {
   try {
     await web3Eth.disconnect() // clean if it is a retry
     let connected = await web3Eth.connect({
@@ -15,7 +15,7 @@ async function connect () {
   } catch (e) {
     if (e.message.indexOf('Could not connect to the blockchain') !== -1) {
       console.log('Trying to connect to the blockchain...')
-      setTimeout(connect, 3000)
+      setTimeout(connectBlockchain, 3000)
     }
   }
 }
@@ -34,6 +34,6 @@ async function getIPNS (x, y) {
 }
 
 module.exports = {
-  connect,
+  connectBlockchain,
   getIPNS
 }
