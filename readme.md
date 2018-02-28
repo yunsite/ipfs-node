@@ -10,13 +10,13 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 | api/resolve/:ipns?dependencies=true | GET | { url: { ipfs: string, dependencies: array } } | 
 | api/get/:ipfs | GET | { data: string } | 
 | api/dependencies/:ipfs | GET | { dependencies: [] } |
-| api/pin/:ipfs | POST | { data: string } | 
+| api/pin/:peerId/:x/:y | GET | { data: object } | 
 
 ## Debugging
 
 You can always check commands manually, get into the container:
 ```
-docker exec it upload bash
+docker exec it ipfs-node bash
 ```
 The command api is documented [here](https://ipfs.io/docs/commands/).
 
@@ -75,14 +75,23 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
   }
 }
 ```
-Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` if one of the txt files.
+Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` is the node peerId
+and there is an IPNS  inside the parcel (1,2)
 
 ```javascript
-# @POST 
-# api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
+# @GET 
+# api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/1/2
+# Success
+
 {
-  "ok":true,
-  "data": "pinned QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK recursively"
+  "ok":true
+}
+
+# Error
+
+{
+  "ok":false,
+  "error": ""
 }
 ```
 
@@ -101,9 +110,18 @@ Notice you cannot get node, only leaf.
 
 ## Usage with docker
 
+### Development
+
 ```
-docker build . -t upload:latest
-docker run -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 upload:latest
+npm run docker:build
+npm run docker:run
+```
+
+### AWS
+
+```
+npm run docker:build
+npm run docker:aws:run
 ```
 
 ## Version
