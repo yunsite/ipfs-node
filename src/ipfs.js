@@ -90,15 +90,6 @@ module.exports = class Download {
     let ipfs = ''
     try {
       ipfs = await Download.resolveIPNS(ipns)
-    } catch (error) {
-      if (error.message.indexOf('can not resolve IPNS')) {
-        // check in our internal dht
-        ipfs = await getIPFS(ipns)
-      } else {
-        return new Promise((resolve, reject) => reject(error))
-      }
-    }
-    try {
       let dependencies = []
       if (shouldGetDependencies) {
         dependencies = await Download.resolveDependencies(ipfs)
@@ -115,9 +106,17 @@ module.exports = class Download {
 
   static resolveIPNS (ipns) {
     return new Promise((resolve, reject) => {
-      execFile('ipfs', ['name', 'resolve', '--nocache', ipns], (err, stdout, stderr) => {
-        if (err) return reject(new Error(stderr))
-        const ipfs = stdout.substr(6, stdout.length - 7)
+      execFile('ipfs', ['name', 'resolve', '--nocache', ipns], async (err, stdout, stderr) => {
+        let ipfs
+        if (err) {
+          ipfs = await getIPFS(ipns)
+          if (!ipfs) {
+            return reject(new Error(stderr))
+          } else {
+            return resolve(ipfs)
+          }
+        }
+        ipfs = stdout.substr(6, stdout.length - 7)
         return resolve(ipfs)
       })
     })

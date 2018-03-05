@@ -10,26 +10,19 @@ module.exports = (() => {
         ipfs TEXT NOT NULL
       )`
     )
-
-    /* db.run(`INSERT INTO dht(ipns, ipfs) VALUES(?, ?)`, ['1231231231212312312', 'aaaaaaaaaaaaaa'], (err) => {
-      if (err) {
-        return console.log(err.message)
-      }
-      // get the last insert id
-      console.log(`A row has been inserted with rowid ${this.lastID}`)
-    }) */
   }
 
   async function getIPFS (ipns) {
-    const ipfs = await db.all(`SELECT ipfs FROM dht WHERE ipns = '${ipns}'`)
-    return ipfs[0]
+    const query = await db.prepare('SELECT ipfs FROM dht WHERE ipns = ?')
+    const ipfs = await query.run([ipns])
+    return ipfs[0] ? ipfs[0].ipfs : null
   }
 
   async function saveIPFS (ipns, ipfs) {
-    await db.run(`
+    const query = await db.prepare(`
       INSERT OR REPLACE INTO dht (ipns, ipfs) 
-      VALUES ('${ipns}',  '${ipfs}')`
-    )
+      VALUES (?,  ?)`)
+    await query.run([ipns, ipfs])
   }
 
   return {

@@ -28,8 +28,6 @@ app.get('/api/resolve/:ipns', ipfs.resolve)
 
 app.get('/api/dependencies/:ipfs', ipfs.dependencies)
 
-
-
 app.listen(process.env.PORT || 3000, () => {
   connectBlockchain()
   connectDB()
