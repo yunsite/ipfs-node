@@ -8,7 +8,7 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 | ------------- |:-------------:|-------------|
 | api/resolve/:ipns | GET | { url: { ipfs: string } } | 
 | api/resolve/:ipns?dependencies=true | GET | { url: { ipfs: string, dependencies: array } } | 
-| api/get/:ipfs | GET | { data: string } | 
+| api/get/:ipfs/:file*? | GET | { data: string } | 
 | api/dependencies/:ipfs | GET | { dependencies: [] } |
 | api/pin/:peerId/:x/:y | GET | { data: object } | 
 
@@ -69,8 +69,8 @@ Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies 
   "url":{
     "ipfs":"QmZ7yyb6gxSnp4xGSZmrsGBM9cNTCd97XPJztv58mF3Dvo",
     "dependencies":[
-      "QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK",
-      "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH"
+      { "name": "file1.txt", "ipfs": "QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK" },
+      { "name": "file2.txt", "ipfs": "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH" }
     ]
   }
 }
@@ -103,6 +103,15 @@ Pinned to the local storage.
 {
   "ok":true,
   "data": "whatever string is on your txt file\n"
+}
+```
+
+```javascript
+# @GET
+# api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/file1.txt
+{
+  "ok":true,
+  "data": "whatever string is on your txt file 1\n"
 }
 ```
 

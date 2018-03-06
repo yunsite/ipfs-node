@@ -8,11 +8,13 @@ module.exports = class Download {
     this.download = async (req, res) => {
       try {
         const ipfs = req.params.ipfs
+        const file = req.params.file
         const blackListed = await isBlacklisted(ipfs)
         if (blackListed) {
           throw new Error(`IPFS ${ipfs} is blacklisted`)
         }
-        const data = await Download.get(ipfs)
+        const path = file ? `${ipfs}/${file}` : ipfs
+        const data = await Download.get(path)
         return res.json({ok: true, data})
       } catch (error) {
         return res.json({ ok: false, error: error.message })
@@ -124,9 +126,15 @@ module.exports = class Download {
 
   static resolveDependencies (ipfs) {
     return new Promise((resolve, reject) => {
-      execFile('ipfs', ['refs', '-u=true', '-r', ipfs], {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
+      execFile('ipfs', ['ls', ipfs], {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
         if (err) return reject(new Error(stderr))
-        const dependencies = stdout.split(/\r?\n/).filter(ipfs => ipfs)
+        const dependencies = stdout.split(/\r?\n/).filter(row => row).map(row => {
+          const data = row.replace(/\s+/g,' ').trim().split(' ') // row format: ipfsHash size name
+          return {
+            ipfs: data[0],
+            name: data[2]
+          }
+        })
         return resolve(dependencies)
       })
     })
