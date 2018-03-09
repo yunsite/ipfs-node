@@ -4,7 +4,6 @@ const cors = require('cors')
 const IPFS = require('./ipfs')
 const { setLogger } = require('./utils')
 const { connectBlockchain } = require('./ethereum')
-const { connectDB } = require('./database')
 
 const app = express()
 
@@ -22,14 +21,14 @@ const ipfs = new IPFS()
 
 app.get('/api/pin/:peerId/:x/:y', ipfs.pin)
 
-app.get('/api/get/:ipfs/:file*?', ipfs.download)
+app.get('/api/get/:ipfs/:file*', ipfs.download)
 
-app.get('/api/resolve/:ipns', ipfs.resolve)
+app.get('/api/resolve/:x/:y', ipfs.resolve)
 
 app.get('/api/dependencies/:ipfs', ipfs.dependencies)
 
 app.listen(process.env.PORT || 3000, () => {
   connectBlockchain()
-  connectDB()
+  // connectDB()
   console.log('Listening on port 3000...')
 })

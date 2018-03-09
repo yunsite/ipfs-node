@@ -1,33 +1,28 @@
-const sqlite = require('sqlite')
+const Promise = require('bluebird')
+const redis = require('redis')
 
-module.exports = (() => {
-  let db
-  async function connectDB () {
-    db = await sqlite.open('db/ipfs.db', { Promise, cached: true })
-    db.run(`
-      CREATE TABLE IF NOT EXISTS dht (
-        ipns TEXT NOT NULL PRIMARY KEY, 
-        ipfs TEXT NOT NULL
-      )`
-    )
-  }
+// const client = Promise.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST))
 
-  async function getIPFS (ipns) {
-    const query = await db.prepare('SELECT ipfs FROM dht WHERE ipns = ?')
-    const ipfs = await query.run([ipns])
-    return ipfs[0] ? ipfs[0].ipfs : null
-  }
+async function setParcel ({ x, y }, url) {
+  await client.setAsync(`${x},${y}`, JSON.stringify(url))
+}
 
-  async function saveIPFS (ipns, ipfs) {
-    const query = await db.prepare(`
-      INSERT OR REPLACE INTO dht (ipns, ipfs) 
-      VALUES (?,  ?)`)
-    await query.run([ipns, ipfs])
-  }
+async function getParcel (x, y) {
+  const url = await client.getAsync(`${x},${y}`)
+  return JSON.parse(url)
+}
 
-  return {
-    connectDB,
-    saveIPFS,
-    getIPFS
-  }
-})()
+async function setIPFS (ipns, ipfs) {
+  await client.setAsync(ipns, ipfs)
+}
+
+function getIPFS (ipns) {
+  return client.getAsync(ipns)
+}
+
+module.exports = {
+  setIPFS,
+  getIPFS,
+  setParcel,
+  getParcel
+}

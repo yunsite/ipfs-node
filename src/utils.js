@@ -25,5 +25,16 @@ module.exports = {
     }
     const accessLogStream = fs.createWriteStream(path.join(__dirname, `../logs/${formatDate(new Date())}.log`), {flags: 'a'})
     app.use(morgan('combined', {stream: accessLogStream}))
+  },
+  getContentType: (file) => {
+    switch (true) {
+      case (file.indexOf('.jpg') !== -1):
+      case (file.indexOf('.png') !== -1):
+        return `image/${file.split('.').pop()}`
+      case (file.indexOf('.mp3') !== -1):
+        return `audio/${file.split('.').pop()}`
+      default:
+        return 'text/plain'
+    }
   }
 }

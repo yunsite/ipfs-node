@@ -7,8 +7,8 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 | Endpoint| Method | Response |
 | ------------- |:-------------:|-------------|
 | api/resolve/:ipns | GET | { url: { ipfs: string } } | 
-| api/resolve/:ipns?dependencies=true | GET | { url: { ipfs: string, dependencies: array } } | 
-| api/get/:ipfs/:file*? | GET | { data: string } | 
+| api/resolve/:x/:y | GET | { url: { inpns: string, ipfs: string, dependencies: array } } | 
+| api/get/:ipfs/:file* | GET | file | 
 | api/dependencies/:ipfs | GET | { dependencies: [] } |
 | api/pin/:peerId/:x/:y | GET | { data: object } | 
 
@@ -48,40 +48,49 @@ ipfs name publish QmUt8guW4C7zDZ7WHociwudbfs83zMZ7Rkxrjkoeg3QupX
 ```
 Et voila! votre ipfs hash is up. Now you can query ipns hashes and dependencies using the API.
 
-```javascript
-# @GET
-# api/resolve/QmNwrcEu5AiDdKZEWzFcGbWxP5j7E1z4eNC7xWaJaVjKMU
-# Should return:
+```http
+GET api/resolve/-81,-108
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 {
-  "ok":true,
-  "url":{
-    "ipfs":"QmZ7yyb6gxSnp4xGSZmrsGBM9cNTCd97XPJztv58mF3Dvo",
-    "dependencies":[]
-  }
+    "ok": true,
+    "url": {
+        "ipns": "Qmbu41fpDf2xp547AQz3uYYXCy81JqWAYU31KW4u7MQPB4",
+        "ipfs": "QmSwTyffPvZt7cxdoGaQWrzQVus3ArqG7WFWct6LF4yCpD",
+        "dependencies": [
+            {
+                "src": "'QmSwTyffPvZt7cxdoGaQWrzQVus3ArqG7WFWct6LF4yCpD",
+                "ipfs": "QmUziFsqDd72KUwYHcGCusY8PVMmgj6bRUFqYv8KL6NCej",
+                "name": "minimap.png'"
+            },
+            {
+                "src": "'QmSwTyffPvZt7cxdoGaQWrzQVus3ArqG7WFWct6LF4yCpD",
+                "ipfs": "QmQ7ixyMcQKyfrPG95pifJBs6qUA2YLkNmDboCq9KtAq9x",
+                "name": "scene.html'"
+            },
+            {
+                "src": "'QmSwTyffPvZt7cxdoGaQWrzQVus3ArqG7WFWct6LF4yCpD",
+                "ipfs": "QmSv553QHeod1fNn9BxaQjxnwQwbQqv2RmLEEyaF71WDuK",
+                "name": "scene.json'"
+            },
+            {
+                "src": "'QmSwTyffPvZt7cxdoGaQWrzQVus3ArqG7WFWct6LF4yCpD",
+                "ipfs": "QmdLYsV4qy3XUcJ1TQw2cHxd2JCUpvHwcEgfgWKzp2kxE6",
+                "name": "scene.xml'"
+            }
+        ]
+    }
 }
 ```
 
-```javascript
-# @GET
-# api/resolve/QmNwrcEu5AiDdKZEWzFcGbWxP5j7E1z4eNC7xWaJaVjKMU?dependencies=true
-{
-  "ok":true,
-  "url":{
-    "ipfs":"QmZ7yyb6gxSnp4xGSZmrsGBM9cNTCd97XPJztv58mF3Dvo",
-    "dependencies":[
-      { "name": "file1.txt", "ipfs": "QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK" },
-      { "name": "file2.txt", "ipfs": "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH" }
-    ]
-  }
-}
-```
 Assuming `QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK` is the node peerId
 and there is an IPNS  inside the parcel (1,2)
 
-```javascript
-# @GET 
-# api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/1/2
-# Success
+```http
+GET api/pin/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/1/2
+HTTP/1.1 200 OK
+Content-Type: application/json
 
 {
   "ok":true
@@ -95,24 +104,13 @@ and there is an IPNS  inside the parcel (1,2)
 }
 ```
 
-Pinned to the local storage.
+Get a file
 
-```javascript
-# @GET
-# api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
-{
-  "ok":true,
-  "data": "whatever string is on your txt file\n"
-}
-```
+```http
+GET api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
+HTTP/1.1 200 OK
+Content-Type: mediatype/extension
 
-```javascript
-# @GET
-# api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/file1.txt
-{
-  "ok":true,
-  "data": "whatever string is on your txt file 1\n"
-}
 ```
 
 Notice you cannot get node, only leaf.

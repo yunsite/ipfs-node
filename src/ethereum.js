@@ -21,16 +21,16 @@ async function connectBlockchain () {
 }
 
 async function getIPNS (x, y) {
-  const land = web3Eth.getContract('LANDRegistry')
-  const metadata = await land.getData(x, y)
-  let ipns = ''
-  console.log(metadata)
+  let ipns
   try {
-    const ipns = LANDRegistry.decodeLandData(metadata).ipns
+    const land = web3Eth.getContract('LANDRegistry')
+    const metadata = await land.landData(x, y)
+    ipns = await LANDRegistry.decodeLandData(metadata).ipns
     return ipns ? ipns.split(':')[1] : 0
   } catch (e) {
-    return ipns
+    console.log(e.message)
   }
+  return ipns
 }
 
 module.exports = {

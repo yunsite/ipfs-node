@@ -6,3 +6,5 @@ package-lock.json
 data
 ipfs.db
 logs
+tmp
+redis-data
