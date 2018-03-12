@@ -1,7 +1,8 @@
 require('babel-polyfill')
 require('dotenv').config({path: './.env'})
-const web3Eth = require('decentraland-commons').eth
-const LANDRegistry = require('decentraland-commons/dist/contracts').LANDRegistry
+const { eth, contracts } = require('decentraland-commons')
+const web3Eth = eth
+const { LANDRegistry } = contracts
 
 async function connectBlockchain () {
   try {

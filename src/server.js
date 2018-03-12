@@ -7,7 +7,6 @@ const { connectBlockchain } = require('./ethereum')
 
 const app = express()
 
-// Allow other domains to connect, todo, limit to DCL domains
 app.use(cors())
 
 // Parse the huge uploads we may get, still 100mb limit
