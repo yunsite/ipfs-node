@@ -24,8 +24,8 @@ app.get('/api/get/:ipfs/:file*', ipfs.download)
 
 app.get('/api/resolve/:x/:y', ipfs.resolve)
 
-app.listen(process.env.PORT || 3000, () => {
+const port = process.env.PORT || 3000
+app.listen(port, () => {
   connectBlockchain()
-  // connectDB()
-  console.log('Listening on port 3000...')
+  console.log(`Listening on port ${port}...`)
 })

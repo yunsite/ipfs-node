@@ -4,7 +4,5 @@ yarn.lock
 package-lock.json
 .env
 data
-ipfs.db
 logs
-tmp
 redis-data

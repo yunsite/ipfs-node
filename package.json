@@ -9,7 +9,7 @@
     "docker:run": "docker run --name=ipfs-node -v $PWD/db:/root/app/ipfs-node/db  -v $PWD/data:/root/.ipfs  -v ~/.ssh/id_rsa:/root/.ssh/id_rsa -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 uploader:latest",
     "docker:vbox:run": "docker run --name=ipfs-node -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 uploader:latest",
     "docker:aws:run": "docker run --name=ipfs-node -v $PWD/db:/uploader/db  -v $PWD/data:/root/.ipfs  -v ~/.ssh/id_ed25519:/root/.ssh/id_rsa --env-file .env -p 3000:3000 -p 4001:4001 -p 5001:5001 -p 8080:8080 uploader:latest",
-    "start": "nodemon --ignore 'tmp' src/server.js"
+    "start": "nodemon src/server.js"
   },
   "author": "The Decentraland Team",
   "license": "Apache-2.0",
