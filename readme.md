@@ -9,7 +9,6 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 | api/pin/:peerId/:x/:y | GET | { data: object } | 
 | api/resolve/:x/:y | GET | { url: { inpns: string, ipfs: string, dependencies: array } } | 
 | api/get/:ipfs/:file* | GET | file | 
-| api/dependencies/:ipfs | GET | { dependencies: [] } |
 
 ## Debugging
 

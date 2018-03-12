@@ -24,8 +24,6 @@ app.get('/api/get/:ipfs/:file*', ipfs.download)
 
 app.get('/api/resolve/:x/:y', ipfs.resolve)
 
-app.get('/api/dependencies/:ipfs', ipfs.dependencies)
-
 app.listen(process.env.PORT || 3000, () => {
   connectBlockchain()
   // connectDB()
