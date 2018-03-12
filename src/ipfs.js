@@ -1,11 +1,7 @@
 const execFile = require('child_process').execFile
-const path = require('path')
-const fs = require('fs')
 const { getIPNS } = require('./ethereum')
 const { isHashBlacklisted, isParcelBlacklisted } = require('./blacklist')
 const { setParcel, getParcel, setIPFS, getIPFS } = require('./database')
-const { getContentType } = require('./utils')
-const axios = require('axios')
 const request = require('request')
 
 module.exports = class Download {
@@ -13,11 +9,13 @@ module.exports = class Download {
     this.download = async (req, res) => {
       try {
         const ipfs = req.params.ipfs
-        const file = `${ipfs}/${req.params.file}`
-        const blackListed = await isHashBlacklisted(ipfs)
+        const file = req.params.file ? `${ipfs}/${req.params.file}` : ipfs
+
+        const blackListed = await isHashBlacklisted(ipfs) // TODO: maybe check if it is a directory
         if (blackListed) {
           throw new Error(`IPFS ${ipfs} is blacklisted`)
         }
+
         request.get(`http://localhost:8080/ipfs/${file}`).pipe(res)
       } catch (error) {
         return res.json({ ok: false, error: error.message })

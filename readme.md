@@ -6,11 +6,10 @@ This is a node.js express app that uses the go-ipfs client (the js-ipfs client [
 
 | Endpoint| Method | Response |
 | ------------- |:-------------:|-------------|
-| api/resolve/:ipns | GET | { url: { ipfs: string } } | 
+| api/pin/:peerId/:x/:y | GET | { data: object } | 
 | api/resolve/:x/:y | GET | { url: { inpns: string, ipfs: string, dependencies: array } } | 
 | api/get/:ipfs/:file* | GET | file | 
 | api/dependencies/:ipfs | GET | { dependencies: [] } |
-| api/pin/:peerId/:x/:y | GET | { data: object } | 
 
 ## Debugging
 
@@ -109,10 +108,21 @@ Get a file
 ```http
 GET api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK
 HTTP/1.1 200 OK
-Content-Type: mediatype/extension
-
+Content-Type: stream
 ```
 
+```http
+ GET api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/filename
+ HTTP/1.1 200 OK
+ Content-Type: stream
+ ```
+ 
+ ```http
+  GET api/get/QmexQCWwaEdEDWrMArR2T2g3V4RGvXXiXj6HgWfRBCumDK/subfolder/ilename
+  HTTP/1.1 200 OK
+  Content-Type: stream
+  ```
+  
 Notice you cannot get node, only leaf.
 
 ## Usage with docker
