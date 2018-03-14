@@ -9,7 +9,7 @@ module.exports = class Download {
     this.download = async (req, res) => {
       try {
         const ipfs = req.params.ipfs
-        const file = req.params.file ? `${ipfs}/${req.params.file}` : ipfs
+        const file = req.params[0] ? `${ipfs}/${req.params[0]}` : ipfs
 
         const blackListed = await isHashBlacklisted(ipfs) // TODO: maybe check if it is a directory
         if (blackListed) {

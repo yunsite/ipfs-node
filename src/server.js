@@ -20,7 +20,7 @@ const ipfs = new IPFS()
 
 app.get('/api/pin/:peerId/:x/:y', ipfs.pin)
 
-app.get('/api/get/:ipfs/:file*', ipfs.download)
+app.get('/api/get/:ipfs*?', ipfs.download)
 
 app.get('/api/resolve/:x/:y', ipfs.resolve)
 
