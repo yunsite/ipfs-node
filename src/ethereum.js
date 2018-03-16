@@ -29,6 +29,7 @@ async function getIPNS (x, y) {
     ipns = await LANDRegistry.decodeLandData(metadata).ipns
     return ipns ? ipns.split(':')[1] : 0
   } catch (e) {
+    // return undefined ipns
     console.log(e.message)
   }
   return ipns

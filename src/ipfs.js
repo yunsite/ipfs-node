@@ -28,15 +28,12 @@ module.exports = class Download {
         if (!ipns) {
           throw new Error('The land has not IPNS associated')
         }
-        const connect = await Download.connectToPeer(req.params.peerId)
-        let response = false
-        if (connect) {
-          const url = await Download.getTarget(ipns)
-          response = await Download.publishHash(url.ipfs)
-          await setIPFS(url.ipns, url.ipfs)
-          await setParcel({ x, y }, url)
-        }
-        return res.json({ ok: response })
+        await Download.connectToPeer(req.params.peerId)
+        const url = await Download.getTarget(ipns)
+        await Download.publishHash(url.ipfs)
+        await setIPFS(url.ipns, url.ipfs)
+        await setParcel({ x, y }, url)
+        return res.json({ ok: true, message: 'Pinning Success' })
       } catch (error) {
         return res.json({ ok: false, error: error.message })
       }
@@ -65,19 +62,6 @@ module.exports = class Download {
         return res.json({ ok: false, error: error.message })
       }
     }
-    this.dependencies = async (req, res) => {
-      try {
-        const ipfs = req.params.ipfs
-        const blackListed = await isHashBlacklisted(ipfs)
-        if (blackListed) {
-          throw new Error(`IPFS ${ipfs} is blacklisted`)
-        }
-        const dependencies = await Download.resolveDependencies(ipfs)
-        return res.json({ok: true, dependencies})
-      } catch (error) {
-        return res.json({ ok: false, error: error.message })
-      }
-    }
   }
 
   static publishHash (ipfs) {
@@ -90,19 +74,18 @@ module.exports = class Download {
         if (!match) {
           reject(new Error('Can not pin: ' + ipfs))
         }
-        return resolve(true)
+        return resolve()
       })
     })
   }
 
   static async getTarget (ipns) {
-    let ipfs = ''
     try {
-      ipfs = await Download.resolveIPNS(ipns)
+      const ipfs = await Download.resolveIPNS(ipns)
       const dependencies = await Download.resolveDependencies(ipfs)
-      return new Promise(resolve => resolve({ ipns, ipfs, dependencies }))
+      return Promise.resolve({ ipns, ipfs, dependencies })
     } catch (error) {
-      return new Promise((resolve, reject) => reject(error))
+      return Promise.reject(error)
     }
   }
 
@@ -111,6 +94,7 @@ module.exports = class Download {
       execFile('ipfs', ['name', 'resolve', '--nocache', ipns], async (err, stdout, stderr) => {
         let ipfs
         if (err) {
+          // Check it with our dht
           ipfs = await getIPFS(ipns)
           if (!ipfs) {
             return reject(new Error(stderr))
@@ -126,7 +110,10 @@ module.exports = class Download {
 
   static resolveDependencies (ipfs) {
     return new Promise((resolve, reject) => {
-      execFile('ipfs', ['refs', '-r', '--format=\'<src> <dst> <linkname>\'', ipfs], {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
+      execFile('ipfs',
+      ['refs', '-r', '--format=\'<src> <dst> <linkname>\'', ipfs],
+      {maxBuffer: 1024 * 500},
+      (err, stdout, stderr) => {
         if (err) return reject(new Error(stderr))
         const dependencies = stdout.split(/\r?\n/).filter(row => row).map(row => {
           const data = row.replace(/\s+/g, ' ').trim().split(' ') // row format: src | ipfsHash | name
@@ -149,7 +136,7 @@ module.exports = class Download {
         if (!match) {
           reject(new Error('Can not connect to: ' + peerId))
         }
-        return resolve(true)
+        return resolve()
       })
     })
   }
